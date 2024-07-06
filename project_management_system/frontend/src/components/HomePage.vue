@@ -38,6 +38,81 @@
               v-model="editItem.language"
               label="Language"
             ></v-text-field>
+            <v-card class="mb-4">
+              <v-card-title>Repositories</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col>
+                    <v-text-field v-model="editItem.r_title" label="Repo Title">
+                    </v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field v-model="editItem.r_url" label="Repo URL">
+                    </v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field v-model="editItem.r_email" label="Repo Email">
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-select
+                      v-model="editItem.r_type"
+                      label="Repo Type"
+                      :items="typeItems"
+                    >
+                    </v-select>
+                  </v-col>
+                  <v-col>
+                    <v-text-field v-model="editItem.r_token" label="Repo Token">
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+            <v-card class="mb-4">
+              <v-card-title>Trackers</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col>
+                    <v-text-field
+                      v-model="editItem.t_title"
+                      label="Track Title"
+                    >
+                    </v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field v-model="editItem.t_url" label="Track URL">
+                    </v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      v-model="editItem.t_email"
+                      label="Track Email"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-select
+                      v-model="editItem.t_type"
+                      label="Track Type"
+                      :items="typeItemsTrack"
+                    >
+                    </v-select>
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      v-model="editItem.t_token"
+                      label="Track Token"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -65,14 +140,27 @@ import axios from "axios";
 export default {
   setup() {
     const items = ref([]);
+    const typeItems = ref(["Github", "GitLab", "Bitbucket"]);
+    const typeItemsTrack = ref(["Github", "GitLab", "Jira"]);
     const dialog = ref(false);
     const isEdit = ref(false);
+	const originalItems = ref([])
     const editItem = ref({
       id: "",
       name: "",
       description: "",
       slug: "",
       language: "",
+      r_title: "",
+      r_url: "",
+      r_type: "",
+      r_email: "",
+      r_token: "",
+      t_title: "",
+      t_url: "",
+      t_type: "",
+      t_email: "",
+      t_token: "",
     });
     const headers = ref([
       { title: "ID", key: "id" },
@@ -85,43 +173,49 @@ export default {
       { title: "Actions", key: "actions", sortable: false },
     ]);
 
-const fetchProjects = () => {
-    axios.get("http://localhost:8000/api/projects/")
+    const fetchProjects = () => {
+      axios
+        .get("http://localhost:8000/api/projects/")
         .then((response) => {
-            const updatedData = response.data.map(item => {
-                if (item.repositories.length > 0)
-				{
-                    item.repositories = item.repositories.map(repo => {
-                        return `ID: ${repo.id}, Title: ${repo.title}, URL: ${repo.url}, Type: ${repo.type}, Email: ${repo.email}, Token: ${repo.token}, Project: ${repo.project}`;
-                    }).join(' | ');
-                } else 
-                    item.repositories = "No repositories";
-				if (item.trackers.length > 0)
-				{
-					item.trackers = item.trackers.map(track => {
-						return `ID: ${track.id}, Title: ${track.title}, URL: ${track.url}, Type: ${track.type}, Email: ${track.email}, Token: ${track.token}, Project: ${track.project}`;
-					}).join(' | ')
-				} else {
-					item.trackers = "No Trackers"
-				}
-                return item;
-            });
+          const updatedData = response.data.map((item) => {
+            if (item.repositories.length > 0) {
+              item.repositories = item.repositories
+                .map((repo) => {
+                  return `ID: ${repo.id}, Title: ${repo.title}, URL: ${repo.url}, Type: ${repo.type}, Email: ${repo.email}, Token: ${repo.token}, Project: ${repo.project}`;
+                })
+                .join(" | ");
+            } else item.repositories = "No repositories";
+            if (item.trackers.length > 0) {
+              item.trackers = item.trackers
+                .map((track) => {
+                  return `ID: ${track.id}, Title: ${track.title}, URL: ${track.url}, Type: ${track.type}, Email: ${track.email}, Token: ${track.token}, Project: ${track.project}`;
+                })
+                .join(" | ");
+            } else {
+              item.trackers = "No Trackers";
+            }
+            return item;
+          });
 
-            items.value = updatedData;
-            console.log(items.value);
+          originalItems.value = response.data;
+          items.value = updatedData;
+          console.log(items.value);
         })
         .catch((error) => {
-            console.log(error);
+          console.log(error);
         });
-};
+    };
 
-    const deleteProject =  (id) => {
-        axios.delete(`http://localhost:8000/api/projects/${id}/`).then((res) => {
-			items.value = items.value.filter((item) => item.id !== id);
-			console.log(res);
-		}).catch((err) => {
-			console.log(err);
-		});
+    const deleteProject = (id) => {
+      axios
+        .delete(`http://localhost:8000/api/projects/${id}/`)
+        .then((res) => {
+          items.value = items.value.filter((item) => item.id !== id);
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
 
     const editProject = (item) => {
@@ -180,6 +274,8 @@ const fetchProjects = () => {
     });
 
     return {
+      typeItemsTrack,
+      typeItems,
       items,
       headers,
       dialog,
