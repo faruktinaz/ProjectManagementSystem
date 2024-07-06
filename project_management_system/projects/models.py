@@ -17,3 +17,14 @@ class Repository(models.Model):
     type = models.CharField(choices=TYPES, max_length=10)
     email = models.EmailField()
     token = models.CharField()
+
+class Tracker(models.Model):
+    TRACKER_TYPES = [
+        ('github', 'GitHub'), ('gitlab', 'GitLab'), ('jira', 'Jira'),
+    ]
+    project = models.ForeignKey(Project, related_name='trackers', on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    url = models.URLField()
+    type = models.CharField(choices=TRACKER_TYPES, max_length=10)
+    email = models.EmailField()
+    token = models.CharField()
