@@ -2,7 +2,6 @@
   <v-app>
     <v-main>
       <Home />
-      <h1>Test</h1>
     </v-main>
   </v-app>
 </template>
