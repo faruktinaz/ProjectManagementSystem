@@ -14,14 +14,14 @@ cd project_management_system
 **Create a new Python Virtual Environment:**
 
 ```bash
-python3 -r venv venv
+python3 -m venv venv
 ```
 
 **Activate the venv and install Django dependencies:**
 
 ```bash
 source ./venv/bin/activate
-pip install -m ./requirements.txt
+pip install -r ./requirements.txt
 ```
 
 **Apply Django migrations:**
