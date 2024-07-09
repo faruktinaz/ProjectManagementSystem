@@ -14,7 +14,7 @@ cd project_management_system
 **Create a new Python Virtual Environment:**
 
 ```bash
-python3 -m venv venv
+python3 -r venv venv
 ```
 
 **Activate the venv and install Django dependencies:**
